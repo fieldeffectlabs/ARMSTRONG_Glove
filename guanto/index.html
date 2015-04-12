@@ -1,0 +1,67 @@
+
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <script src="http://www.webglearth.com/v2/api.js"></script>
+     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script>
+    var earth;
+      function initialize() {
+        var options = {atmosphere: true, center: [41.893011, 12.492635], zoom: 3};
+        earth = new WE.map('earth_div', options);
+        WE.tileLayer('http://otile{s}.mqcdn.com/tiles/1.0.0/sat/{z}/{x}/{y}.jpg', {
+          subdomains: '1234',
+          attribution: 'Tiles Courtesy of MapQuest'
+        }).addTo(earth);
+      }
+
+      var getData = function () {
+        console.log("GETTING DATA...");
+          $.get("http://127.0.0.1:30000")
+          .success(function (data) {
+            console.log(data);
+            var c = earth.getPosition();
+            var json=JSON.parse(data);
+             if(json.t=="UP")
+              earth.panTo([c[0]+2, c[1]],5);
+             else if(json.t=="DW")
+              earth.panTo([c[0]-2, c[1]],5);
+              else if(json.t=="SX")
+              earth.panTo([c[0], c[1]-2],5);
+               else if (json.t=="DX")
+                earth.panTo([c[0], c[1]+2],5);
+              else if (json.t=="TH")
+                earth.setZoom(earth.getZoom()-0.4);
+              else if (json.t=="ID")
+                earth.setZoom(earth.getZoom()+0.4);
+             if(json.t!="")
+              document.getElementById("gest").innerHTML = json.t.toString();
+             //console.log(json.x);
+        });
+      }
+
+            var pan = function () {
+              console.log(earth.getZoom());
+              earth.setZoom(earth.getZoom()+0.2);
+        //earth.setZoom(1);
+          /*$http.get("http://127.0.0.1:30000")
+          .success(function (data) {
+        });*/
+      }
+
+      setInterval(getData, 800);
+      //setInterval(pan, 2000);
+    </script>
+    <style>
+      html, body{padding: 0; margin: 0;}
+      #earth_div{top: 0; right: 0; bottom: 0; left: 0;  
+                 background-color: #000; position: absolute !important;}
+      </style>
+            <title>ARMSTRONG Glove</title>
+    </head>
+    <body style="background: black" onload="initialize()">
+      <div></div><div style="width: 100%" id="earth_div"></div>
+      <div id="gest" style="position: absolute; bottom: 0px; right: 25px; font-size: 20px; color: white">XXXXXX</div>
+      <div></div>
+  </body>
+</html>
